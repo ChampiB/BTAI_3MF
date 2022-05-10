@@ -118,3 +118,4 @@ class LikelihoodModelWidget(tk.Frame):
         cbox = self.parent.posterior_widget.cbox
         index = cbox['values'].index(name)
         cbox.current(index)
+        self.parent.posterior_widget.refresh_widget(None)
