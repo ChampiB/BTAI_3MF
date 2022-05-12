@@ -12,7 +12,7 @@ def main():
     """
 
     # Create the environment.
-    env = dSpritesEnv(granularity=8, repeat=16)
+    env = dSpritesEnv(granularity=1, repeat=8)
     env = dSpritesPreProcessingWrapper(env)
 
     # Define the parameters of the generative model.
@@ -38,14 +38,11 @@ def main():
         .add_transition("S_orientation", b["S_orientation"], ["S_orientation"]) \
         .add_transition("S_pos_x", b["S_pos_x"], ["S_pos_x", "A_1"]) \
         .add_transition("S_pos_y", b["S_pos_y"], ["S_pos_y", "A_1"]) \
-        .add_preference(["O_pos_x", "O_shape"], c["O_pos_x_shape"]) \
-        .add_preference("O_pos_y", c["O_pos_y"]) \
-        .add_preference("O_scale", c["O_scale"]) \
-        .add_preference("O_orientation", c["O_orientation"]) \
+        .add_preference(["O_pos_x", "O_pos_y", "O_shape"], c["O_pos_x_shape"]) \
         .build()
 
     # Create the agent.
-    agent = BTAI_3MF(ts, max_planning_steps=100, exp_const=5)
+    agent = BTAI_3MF(ts, max_planning_steps=100, exp_const=2)
 
     # Create the GUI for analysis.
     gui = GUI(env, agent)

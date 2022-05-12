@@ -27,16 +27,15 @@ class dSpritesEnv:
         self.max_episode_length = 50
         self.need_reset = False
 
-        self.s_sizes = torch.tensor([1, 3, 6, 40, 32, 32])
-        self.s_dim = self.s_sizes.size()
+        self.images, self.s_sizes, self.s_dim, self.s_bases = DataSet.get(dataset_file)
+        self.s_dim = self.s_sizes.size
+        self.state = torch.zeros(self.s_dim)
         self.s_bases_obs = torch.tensor([0, self.n_pos * (self.n_pos + 1), 0, 0, self.n_pos + 1, 1])
         self.s_bases_img = torch.tensor([737280, 245760, 40960, 1024, 32, 1])
-        self.state = torch.zeros(self.s_dim)
 
         # Graphical interface
         self.np_precision = np.float64
         self.viewer = None
-        self.images, self.s_sizes, self.s_dim, self.s_bases = DataSet.get(dataset_file)
 
     def reset_hidden_state(self):
         """
@@ -133,7 +132,7 @@ class dSpritesEnv:
         self.state = self.simulate(action, self.state)
 
         # If the object crossed the bottom line, then:
-        # compute the reward, generate a new image .
+        # compute the reward, generate a new image.
         if self.state[5] >= 32:
             if self.state[1] < 0.5:
                 self.last_r = self.compute_square_reward()

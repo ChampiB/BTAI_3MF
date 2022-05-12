@@ -1,4 +1,5 @@
 import tkinter as tk
+import math
 
 
 class ExpectedFreeEnergyWidget(tk.Frame):
@@ -84,10 +85,17 @@ class ExpectedFreeEnergyWidget(tk.Frame):
         # Update y-axis label.
         self.canvas.itemconfig(self.y_label, text=self.display)
 
-        # Get total value to display, width of each bar, and max vertical space.
-        total_value = sum(self.data.values())
+        # Get most extrem value to display, width of each bar, and max vertical space.
+        max_value = -math.inf
+        min_value = math.inf
+        total_value = 0
+        for value in self.data.values():
+            total_value += value
+            max_value = max(max_value, total_value)
+            min_value = min(min_value, total_value)
+        ext_value = min_value if abs(min_value) > abs(max_value) else max_value
         bar_width = 30
-        max_vspace = self.y_a2 - self.y_o + 50
+        max_vspace = self.y_a2 - self.y_o + 10
 
         # Display the bars representing posterior probabilities.
         xshift = self.x_o + 20
@@ -99,7 +107,7 @@ class ExpectedFreeEnergyWidget(tk.Frame):
             # Display a bar for each term.
             tags = "bar_{}".format(key)
             self.bar_tags.append(tags)
-            bar_height = int(self.data[key] / total_value * max_vspace)
+            bar_height = int(self.data[key] / ext_value * max_vspace)
             self.canvas.create_rectangle(
                 xshift, yshift,
                 xshift + bar_width, yshift + bar_height,
@@ -176,7 +184,7 @@ class ExpectedFreeEnergyWidget(tk.Frame):
         else:
             # Load the ambiguity components.
             ambiguities = self.gui.current_ts.compute_ambiguity_terms()
-            for i, rv_name in enumerate(self.gui.current_ts.obs_prior_pref.keys()):
+            for i, rv_name in enumerate(self.gui.current_ts.obs_likelihood.keys()):
                 self.data["ambiguity[{}]".format(rv_name)] = ambiguities[i]
 
     def update_display_type(self, event):
@@ -257,9 +265,11 @@ class ExpectedFreeEnergyWidget(tk.Frame):
         text = self.canvas.create_text(event.x, event.y, text=term_name, tags="tooltip", anchor=anchor)
         pos = self.canvas.bbox(text)
         margin = 3
-        if pos[2] + margin > self.canvas.winfo_width() \
-                or pos[1] - margin < 0 \
-                or pos[0] - margin < 0:
+        if anchor != 'w' and (
+                pos[2] + margin > self.canvas.winfo_width()
+                or pos[1] - margin < 0
+                or pos[0] - margin < 0
+        ):
             anchors = ['sw', 'se', 'nw', 'ne', 's', 'n', 'e', 'w']
             anchor = anchors[anchors.index(anchor) + 1]
             self.delete_tooltip()

@@ -33,11 +33,12 @@ class TemporalSlice:
         self.obs_prior_pref = obs_prior_pref
         self.obs_likelihood = obs_likelihood
         self.obs_parents = obs_parents
+        self.initial_states_prior = {k: v.clone() for k, v in states_prior.items()}
         self.states_prior = states_prior
         self.states_transition = states_transition
         self.states_parents = states_parents
         self.states_posterior = {k: torch.ones_like(v) for k, v in states_prior.items()}
-        self.obs_posterior = {k: torch.ones_like(v) for k, (l, v) in obs_prior_pref.items()}
+        self.obs_posterior = {k: torch.ones_like(v) for k, v in obs_likelihood.items()}
         self.action = -1
         self.cost = 0
         self.visits = 1
@@ -50,6 +51,7 @@ class TemporalSlice:
         :return: nothing.
         """
         self.fg.reset_messages()
+        self.states_prior = {k: v.clone() for k, v in self.initial_states_prior.items()}
         self.cost = 0
         self.visits = 1
         self.parent = None
@@ -228,7 +230,7 @@ class TemporalSlice:
                     subset_posterior = subset_posterior.view(-1)
 
             # Compute the risk term of the expected free energy.
-            risk = subset_posterior * (subset_posterior.log() - prior_pref.view(-1))
+            risk = subset_posterior * (subset_posterior.log() - prior_pref.log().view(-1))
             risk = risk.sum()
 
             # Save risk term.
@@ -247,7 +249,7 @@ class TemporalSlice:
         ambiguity_terms = []
 
         # For each modality.
-        for obs_name in self.obs_prior_pref.keys():
+        for obs_name in self.obs_likelihood.keys():
             # Compute the ambiguity.
             ambiguity = - self.obs_likelihood[obs_name].log()
             ambiguity = Operators.average(

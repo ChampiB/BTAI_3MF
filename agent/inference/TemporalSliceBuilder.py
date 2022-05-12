@@ -134,8 +134,6 @@ class TemporalSliceBuilder:
             raise Exception("No state has been added to the temporal slice.")
         if len(self.states_prior) != len(self.states_transition):
             raise Exception("The number of transitions must equal the number of states.")
-        if len(self.obs_likelihood) != len(self.obs_prior_pref):
-            raise Exception("The number of prior preferences must equal the number of observations.")
         return TemporalSlice(
             fg, self.n_actions, self.action_name, self.obs_prior_pref,
             self.obs_likelihood, self.states_prior, self.states_transition,

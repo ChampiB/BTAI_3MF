@@ -3,6 +3,17 @@ from env.dSpritesEnv import dSpritesEnv
 from env.wrapper.dSpritesPreProcessingWrapper import dSpritesPreProcessingWrapper
 from agent.BTAI_3MF import BTAI_3MF
 
+# ------------------------------------------------------------------------------------------ #
+# Results:
+# ------------------------------------------------------------------------------------------ #
+# dSpritesEnv(granularity=8, repeat=8) + max_planning_steps=50 + exp_const=2.4) -> 0.9034375 #
+# dSpritesEnv(granularity=4, repeat=8) + max_planning_steps=50 + exp_const=2.4) -> 0.9790625 #
+# dSpritesEnv(granularity=2, repeat=8) + max_planning_steps=50 + exp_const=2.4) -> 0.9965625 #
+# dSpritesEnv(granularity=1, repeat=8) + max_planning_steps=50 + exp_const=2.4) -> 0.78      #
+# dSpritesEnv(granularity=1, repeat=8) + max_planning_steps=100 + exp_const=2.4) -> 0.79     #
+# dSpritesEnv(granularity=1, repeat=8) + max_planning_steps=150 + exp_const=2.4) -> 1.0      #
+# ------------------------------------------------------------------------------------------ #
+
 
 def main():
     """
@@ -11,14 +22,14 @@ def main():
     """
 
     # Create the environment.
-    env = dSpritesEnv(granularity=8, repeat=16)
+    env = dSpritesEnv(granularity=1, repeat=8)
     env = dSpritesPreProcessingWrapper(env)
 
     # Define the parameters of the generative model.
     a = env.a()
     b = env.b()
     c = env.c()
-    d = env.d()
+    d = env.d(uniform=True)
 
     # Define the temporal slice structure.
     ts = TemporalSliceBuilder("A_0", env.n_actions) \
@@ -37,24 +48,28 @@ def main():
         .add_transition("S_shape", b["S_shape"], ["S_shape"]) \
         .add_transition("S_scale", b["S_scale"], ["S_scale"]) \
         .add_transition("S_orientation", b["S_orientation"], ["S_orientation"]) \
-        .add_preference(["O_pos_x", "O_shape"], c["O_pos_x_shape"]) \
-        .add_preference("O_pos_y", c["O_pos_y"]) \
-        .add_preference("O_scale", c["O_scale"]) \
-        .add_preference("O_orientation", c["O_orientation"]) \
+        .add_preference(["O_pos_x", "O_pos_y", "O_shape"], c["O_pos_x_shape"]) \
         .build()
 
     # Create the agent.
-    agent = BTAI_3MF(ts, max_planning_steps=100, exp_const=5)
+    agent = BTAI_3MF(ts, max_planning_steps=150, exp_const=2.4)
 
-    # Implement the action-perception cycle.
-    obs = env.reset()
-    env.render()
-    agent.reset(obs)
-    while not env.done():
-        action = agent.step()
-        obs = env.execute(action)
+    # Implement the action-perception cycles.
+    n_trials = 100
+    score = 0
+    for i in range(n_trials):
+        obs = env.reset()
         env.render()
-        agent.update(action, obs)
+        agent.reset(obs)
+        while not env.done():
+            action = agent.step()
+            obs = env.execute(action)
+            env.render()
+            agent.update(action, obs)
+        score += env.get_reward()
+
+    # Display the performance of the agent.
+    print("Percentage of task solved: {}".format((score + n_trials) / (2 * n_trials)))
 
 
 if __name__ == '__main__':
