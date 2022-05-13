@@ -148,7 +148,7 @@ class dSpritesPreProcessingWrapper:
                 preference[int(self.env.n_pos - 1)][y_pos][shape] = 5
         shape = preference.shape
         preference = torch.softmax(preference.view(-1), dim=0).view(shape)
-        preferences[self.obs_names[4] + "_shape"] = preference
+        preferences[self.obs_names[1] + "_pos_x_y"] = preference
 
         # Create preferences over the y position.
         noise = 0.6

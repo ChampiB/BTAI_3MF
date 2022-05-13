@@ -38,7 +38,7 @@ def main():
         .add_transition("S_orientation", b["S_orientation"], ["S_orientation"]) \
         .add_transition("S_pos_x", b["S_pos_x"], ["S_pos_x", "A_1"]) \
         .add_transition("S_pos_y", b["S_pos_y"], ["S_pos_y", "A_1"]) \
-        .add_preference(["O_pos_x", "O_pos_y", "O_shape"], c["O_pos_x_shape"]) \
+        .add_preference(["O_pos_x", "O_pos_y", "O_shape"], c["O_shape_pos_x_y"]) \
         .build()
 
     # Create the agent.
