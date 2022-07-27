@@ -12,7 +12,7 @@ def main():
     """
 
     # Create the environment.
-    env = dSpritesEnv(granularity=1, repeat=8)
+    env = dSpritesEnv(granularity=1, repeat=1)
     env = dSpritesPreProcessingWrapper(env)
 
     # Define the parameters of the generative model.
@@ -42,7 +42,7 @@ def main():
         .build()
 
     # Create the agent.
-    agent = BTAI_3MF(ts, max_planning_steps=100, exp_const=2)
+    agent = BTAI_3MF(ts, max_planning_steps=100, exp_const=2.4)
 
     # Create the GUI for analysis.
     gui = GUI(env, agent)

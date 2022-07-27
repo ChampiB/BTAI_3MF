@@ -42,7 +42,7 @@ def main():
     """
 
     # Create the environment.
-    env = dSpritesEnv(granularity=4, repeat=8)
+    env = dSpritesEnv(granularity=1, repeat=1)
     env = dSpritesPreProcessingWrapper(env)
 
     # Define the parameters of the generative model.
@@ -72,7 +72,7 @@ def main():
         .build()
 
     # Create the agent.
-    agent = BTAI_3MF(ts, max_planning_steps=50, exp_const=2.4)
+    agent = BTAI_3MF(ts, max_planning_steps=150, exp_const=2.4)
 
     # Implement the action-perception cycles.
     n_trials = 100
