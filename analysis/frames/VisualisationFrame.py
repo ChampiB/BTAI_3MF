@@ -116,16 +116,16 @@ class VisualisationFrame(tk.Frame):
         image = np.squeeze(image).astype(np.uint8)
         return ImageTk.PhotoImage(image=Image.fromarray(image).resize((size, size)))
 
-    def highlight_anscestors_of(self, node, descendant, button, lines_id=None):
+    def highlight_ancestors_of(self, node, descendant, button, lines_id=None):
         """
-        Highlight the button and line if node is an anscestor of descendant.
-        :param node: the potential anscestor.
+        Highlight the button and line if node is an ancestor of descendant.
+        :param node: the potential ancestor.
         :param descendant: the potential descendant.
-        :param button: the button to highlight if node is an anscestor of descendant.
-        :param lines_id: the id of the line to highlight if node is an anscestor of descendant.
+        :param button: the button to highlight if node is an ancestor of descendant.
+        :param lines_id: the id of the line to highlight if node is an ancestor of descendant.
         :return: nothing.
         """
-        if self.is_anscestor_of(node, descendant):
+        if self.is_ancestor_of(node, descendant):
             button.config(highlightbackground=self.gui.red, highlightthickness=2)
             if lines_id is not None:
                 self.canvas.itemconfig(lines_id, fill=self.gui.red, width=2)
@@ -135,15 +135,15 @@ class VisualisationFrame(tk.Frame):
                 self.canvas.itemconfig(lines_id, fill=self.gui.black, width=1)
 
     @staticmethod
-    def is_anscestor_of(anscestor, descendant):
+    def is_ancestor_of(ancestor, descendant):
         """
-        Check if a node is an anscestor of another node.
-        :param anscestor: the potential anscestor.
+        Check if a node is an ancestor of another node.
+        :param ancestor: the potential ancestor.
         :param descendant: the potential descendant.
-        :return: if node is an anscestor of descendant.
+        :return: if node is an ancestor of descendant.
         """
         while descendant is not None:
-            if descendant == anscestor:
+            if descendant == ancestor:
                 return True
             descendant = descendant.parent
         return False
@@ -289,7 +289,7 @@ class VisualisationFrame(tk.Frame):
             bg=self.gui.gray, activebackground=self.gui.light_gray,
             text=self.get_temporal_slice_name(self.current_action_seq)
         )
-        self.highlight_anscestors_of(self.gui.current_ts, self.node_selected_by_uct, self.root_btn)
+        self.highlight_ancestors_of(self.gui.current_ts, self.node_selected_by_uct, self.root_btn)
 
         # Update children nodes and lines.
         for i in range(self.gui.env.n_actions):
@@ -312,8 +312,8 @@ class VisualisationFrame(tk.Frame):
                 text=self.get_temporal_slice_name(self.current_action_seq + str(i))
             )
 
-            # Highlit children that are anscestor of the node selected by the UCT criterion.
-            self.highlight_anscestors_of(
+            # Highlit children that are ancestor of the node selected by the UCT criterion.
+            self.highlight_ancestors_of(
                 self.gui.current_ts.children[i], self.node_selected_by_uct,
                 self.children_btns[i], self.lines_ids[i]
             )

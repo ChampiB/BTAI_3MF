@@ -70,7 +70,7 @@ class GUI:
     def get_screen_size(self):
         """
         Getter.
-        :return: the screen' size.
+        :return: the screen's size.
         """
         screen_size = str(self.window.winfo_screenwidth() - 85)
         screen_size += "x"
